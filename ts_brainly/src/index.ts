@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
-dotenv.config();
+import path from 'path';
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 import express from 'express';
 import { connectdb, Content, Links, Tags, User } from './db';
@@ -177,6 +178,48 @@ app.delete('/api/v1/content', auth, async (req, res) => {
         });
     }
 });
+
+app.put('/api/v1/content', auth, async (req, res) => {
+    try {
+        const { contentId, type, link, tags } = req.body;
+        const title = req.body.title || req.body.tittle;
+        //@ts-ignore
+        const userId = req.userId;
+
+        if (!contentId) {
+            return res.status(400).json({ message: "contentId is required" });
+        }
+
+        const tagIds = [];
+        if (Array.isArray(tags)) {
+            for (const tag of tags) {
+                const tagStr = typeof tag === 'string' ? tag : (tag.tittle || tag.title || '');
+                if (!tagStr) continue;
+                let existingTag = await Tags.findOne({ tittle: tagStr });
+                if (!existingTag) {
+                    existingTag = await Tags.create({ tittle: tagStr });
+                }
+                tagIds.push(existingTag._id);
+            }
+        }
+
+        const updated = await Content.findOneAndUpdate(
+            { _id: contentId, userId },
+            { title, link, type, tags: tagIds },
+            { new: true }
+        ).populate("tags");
+
+        if (!updated) {
+            return res.status(404).json({ message: "Content not found or unauthorized" });
+        }
+
+        return res.status(200).json({ message: "Content updated successfully", content: updated });
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ message: "Error updating content" });
+    }
+});
+
 
 app.post('/api/v1/brain/share', auth, async (req, res) => {
     try {

@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { BACKEND_URL } from "../config";
 import { Card } from "../components/ui/Card";
+import { MasonryLayout } from "../components/ui/MasonryLayout";
 import { Logo } from "../icons/Logo";
 
 interface ContentItem {
@@ -76,10 +77,10 @@ export function SharedBrain() {
                         No public content shared yet.
                     </div>
                 ) : (
-                    <div className="flex flex-wrap gap-4 justify-start">
-                        {contents.map((item) => (
+                    <MasonryLayout
+                        items={contents}
+                        renderItem={(item) => (
                             <Card
-                                key={item._id}
                                 _id={item._id}
                                 title={item.title || item.tittle}
                                 link={item.link}
@@ -87,8 +88,8 @@ export function SharedBrain() {
                                 tags={item.tags}
                                 readOnly={true}
                             />
-                        ))}
-                    </div>
+                        )}
+                    />
                 )}
             </main>
         </div>

@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
+import type { CardSchema } from '../components/ui/Card';
 import { CreateContentModal } from '../components/ui/CreateContentModal';
+import { EditContentModal } from '../components/ui/EditContentModal';
 import { ShareModal } from '../components/ui/ShareModal';
+import { MasonryLayout } from '../components/ui/MasonryLayout';
 import { PlusIcon } from '../icons/PlusIcon';
 import { ShareIcon } from '../icons/ShareIcon';
 import { SideBar } from '../components/ui/SideBar';
@@ -22,6 +25,8 @@ interface ContentItem {
 export function Dashboard() {
     const [modalOpen, setModalOpen] = useState(false);
     const [shareModalOpen, setShareModalOpen] = useState(false);
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [editingItem, setEditingItem] = useState<CardSchema | null>(null);
     const [contents, setContents] = useState<ContentItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -64,6 +69,11 @@ export function Dashboard() {
         setContents((prev) => prev.filter((item) => item._id !== deletedId));
     };
 
+    const handleEditItem = (card: CardSchema) => {
+        setEditingItem(card);
+        setEditModalOpen(true);
+    };
+
     const filteredContents = contents.filter((item) => {
         if (filter === "all") return true;
         if (filter === "twitter") return item.type === "twitter" || item.type === "tweet";
@@ -72,11 +82,21 @@ export function Dashboard() {
 
     return (
         <div className="p-4 min-h-screen bg-gray-100">
-            <SideBar onSelectFilter={(f) => setFilter(f)} />
+            <SideBar onSelectFilter={(f) => setFilter(f)} activeFilter={filter} />
             
             <CreateContentModal
                 close={modalOpen}
                 onClose={() => setModalOpen(false)}
+                onSubmitSuccess={fetchContents}
+            />
+
+            <EditContentModal
+                close={editModalOpen}
+                content={editingItem}
+                onClose={() => {
+                    setEditModalOpen(false);
+                    setEditingItem(null);
+                }}
                 onSubmitSuccess={fetchContents}
             />
 
@@ -121,10 +141,10 @@ export function Dashboard() {
                         No content found. Click <span className="font-semibold text-purple-600">Add Content</span> to create your first note!
                     </div>
                 ) : (
-                    <div className="flex flex-wrap gap-4">
-                        {filteredContents.map((item) => (
+                    <MasonryLayout
+                        items={filteredContents}
+                        renderItem={(item) => (
                             <Card
-                                key={item._id}
                                 id={item._id}
                                 _id={item._id}
                                 title={item.title || item.tittle}
@@ -132,13 +152,15 @@ export function Dashboard() {
                                 type={item.type}
                                 tags={item.tags}
                                 onDelete={handleItemDeleted}
+                                onEdit={handleEditItem}
                             />
-                        ))}
-                    </div>
+                        )}
+                    />
                 )}
             </div>
         </div>
     );
 }
+
 
 

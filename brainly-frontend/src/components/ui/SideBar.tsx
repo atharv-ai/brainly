@@ -1,11 +1,15 @@
 import { Logo } from "../../icons/Logo";
 import { TwitterIcon } from "../../icons/TwitterIcon";
 import { YoutubeIcon } from "../../icons/YoutubeIcon";
+import { DocumentIcon } from "../../icons/DocumentIcon";
+import { LinkIcon } from "../../icons/LinkIcon";
+import { AllNotesIcon } from "../../icons/AllNotesIcon";
 import { SideBarItem } from "./SideBarItem";
 import { useNavigate } from "react-router-dom";
 
 interface SideBarProps {
     onSelectFilter?: (filter: string) => void;
+    activeFilter?: string;
 }
 
 export function SideBar({ onSelectFilter }: SideBarProps) {
@@ -25,9 +29,11 @@ export function SideBar({ onSelectFilter }: SideBarProps) {
                 </div>
 
                 <div className="pt-4 pl-4 space-y-1">
-                    <SideBarItem Icon={<YoutubeIcon />} content="All Notes" onClick={() => onSelectFilter && onSelectFilter("all")} />
+                    <SideBarItem Icon={<AllNotesIcon />} content="All Notes" onClick={() => onSelectFilter && onSelectFilter("all")} />
                     <SideBarItem Icon={<YoutubeIcon />} content="Youtube" onClick={() => onSelectFilter && onSelectFilter("youtube")} />
                     <SideBarItem Icon={<TwitterIcon />} content="Twitter" onClick={() => onSelectFilter && onSelectFilter("twitter")} />
+                    <SideBarItem Icon={<DocumentIcon />} content="Documents" onClick={() => onSelectFilter && onSelectFilter("document")} />
+                    <SideBarItem Icon={<LinkIcon />} content="Links" onClick={() => onSelectFilter && onSelectFilter("link")} />
                 </div>
             </div>
 

@@ -1,0 +1,9 @@
+{
+  "name": "brainly",
+  "private": true,
+  "scripts": {
+    "setup": "npm install --prefix ts_brainly && npm install --prefix brainly-frontend",
+    "dev:backend": "npm run dev --prefix ts_brainly",
+    "dev:frontend": "npm run dev --prefix brainly-frontend"
+  }
+}
